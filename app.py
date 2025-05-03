@@ -4,7 +4,7 @@ import joblib
 import gradio
 from xgboost import XGBClassifier
 import prometheus_client as prom
-from sklearn.metrics import r2_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from fastapi import FastAPI, Request, Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST,start_http_server, Gauge
 
@@ -17,12 +17,12 @@ curr_path = str(Path(__file__).parent)
 app=FastAPI()
 
 
-# Metric object of type gauge
-avg_prediction_gauge = prom.Gauge('model_prediction_avg', 'Average prediction over 100 samples')
+# Metric  object-type gauge
+avg_prediction_gauge = prom.Gauge('model_prediction_avg', 'Average prediction  100 samples')
+recall_metric = prom.Gauge('model_recall_score', 'Recall score for few random 100 test samples')
 
 #LOAD model
 model = joblib.load("xgboost-model.pkl")
-
 
 # --------------------------
 # Prometheus metrics endpoint
@@ -39,7 +39,7 @@ def update_metrics():
 
     # LOAD TEST DATA
     df = pd.read_csv(curr_path +"/heart_failure_clinical_records_dataset.csv")
-    df=df.head(100)
+    df=df.sample(100)
 
     X = df.drop(columns=['DEATH_EVENT']).values
     y_true = df['DEATH_EVENT'].values
@@ -48,10 +48,13 @@ def update_metrics():
 
     # Calculate metrics
     avg_pred = np.mean(y_pred)
+    recall = round(recall_score(y_true, y_pred), 3)
+ 
           
 
     # Update Prometheus metrics
     avg_prediction_gauge.set(avg_pred)
+    recall_metric.set(recall)
     
            
    
