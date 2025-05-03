@@ -19,11 +19,11 @@ scrape_configs:
       - targets: ["probable-fortnight-5gr67p6gq5xxcvx6v-9090.app.github.dev"]     # The target here it's Prometheus itself.
 
 
-  - job_name: "bikeshare-app"
+  - job_name: "Pred-app"
     metrics_path: '/metrics'
     scheme: 'http'
     scrape_interval: 10s       # override default value
     scrape_timeout: 10s       # override default value
     static_configs:
-      - targets: ["3.110.28.230:8080"]     # The target here it's Prometheus itself.
+      - targets: ["probable-fortnight-5gr67p6gq5xxcvx6v-8001.app.github.dev"]     # The target here it's Prometheus itself.
 
